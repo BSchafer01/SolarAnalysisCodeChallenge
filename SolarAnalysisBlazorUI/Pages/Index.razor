@@ -1,0 +1,75 @@
+﻿@page "/"
+
+<h1>Solar Analysis</h1>
+
+<p>Enter the building data in order of building location from left to right.</p>
+
+
+<EditForm Model="@building" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary Model="@building" />
+    <div class="container">
+        <label id="buildingLabel" for="buildingText" >Building Label</label>
+        <InputText @bind-Value="building.label" class="form-control" id="buildingText"></InputText>
+
+        <label id="buildingHeightLabel" for="buildingHeight">Building Height (ft)</label>
+        <InputNumber @bind-Value="@building.height" class="form-control" id="buildingHeight"></InputNumber>
+
+        <label id="buildingWidthLabel" for="buildingWidth">Building Width (ft)</label>
+        <InputNumber @bind-Value="@building.width" class="form-control" id="buildingWidth"></InputNumber>
+
+        <input type="submit" id="formSubmit" value="Add Building" class="btn btn-primary"/>
+    </div>
+
+</EditForm>
+<br />
+<br />
+<div class="table-responsive">
+    <table class="table table-hover table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Building Label</th>
+                <th scope="col">Building Height</th>
+                <th scope="col">Building Width</th>
+                <th scope="col">Sees Sunset</th>
+                <th scope="col">Sees Sunrise</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var b in buildings)
+            {
+                <tr>
+                    <th scope="row">@b.label</th>
+                    <td>@b.height</td>
+                    <td>@b.width</td>
+                    <td>@b.seeSunSet</td>
+                    <td>@b.seeSunRise</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code{
+    private DisplayBuildingModel building = new DisplayBuildingModel();
+    private List<DisplayBuildingModel> buildings = new List<DisplayBuildingModel>();
+
+
+    private void HandleValidSubmit()
+    {
+        List<IBuildingModel> send = new List<IBuildingModel>();
+        List<IBuildingModel> rec = new List<IBuildingModel>();
+        buildings.Add(new DisplayBuildingModel{ height = building.height, label = building.label, width = building.width});
+        foreach (var b in buildings)
+        {
+            send.Add(b);
+        }
+        rec = SunsetSunriseIdentifier.SunsetCheck(send);
+        buildings.Clear();
+        foreach (var r in rec)
+        {
+            buildings.Add(new DisplayBuildingModel { height = r.height, label = r.label, width = r.width, seeSunRise = r.seeSunRise, seeSunSet = r.seeSunSet});
+        }
+    }
+}
