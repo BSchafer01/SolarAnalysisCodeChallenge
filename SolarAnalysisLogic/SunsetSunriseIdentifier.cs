@@ -15,6 +15,8 @@ namespace SolarAnalysisLogic
 
 
             int maxHeight = 0;
+            int sunsetLocation = 0;
+            int sunriseLocation = 0;
             buildings.Reverse();
             foreach (var b in buildings)
             {
@@ -27,6 +29,8 @@ namespace SolarAnalysisLogic
                 {
                     b.seeSunRise = false;
                 }
+                b.riseLocation = sunriseLocation;
+                sunriseLocation += b.width + 5;
             }
             buildings.Reverse();
             maxHeight = 0;
@@ -42,6 +46,8 @@ namespace SolarAnalysisLogic
                 {
                     b.seeSunSet = false;
                 }
+                b.setLocation = sunsetLocation;
+                sunsetLocation += b.width + 5;
                 building.Add(b);
             }
 

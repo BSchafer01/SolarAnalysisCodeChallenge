@@ -19,6 +19,7 @@
         <InputNumber @bind-Value="@building.width" class="form-control" id="buildingWidth"></InputNumber>
 
         <input type="submit" id="formSubmit" value="Add Building" class="btn btn-primary"/>
+        <input type="button" id="clearList" value="Clear Buildings" class="btn btn-danger" @onclick="@(() => ClearList())"/>
     </div>
 
 </EditForm>
@@ -33,19 +34,23 @@
                 <th scope="col">Building Width</th>
                 <th scope="col">Sees Sunset</th>
                 <th scope="col">Sees Sunrise</th>
+                <th scope="col">Sunset Location</th>
+                <th scope="col">Sunrise Location</th>
 
             </tr>
         </thead>
         <tbody>
             @foreach (var b in buildings)
             {
-                <tr>
-                    <th scope="row">@b.label</th>
-                    <td>@b.height</td>
-                    <td>@b.width</td>
-                    <td>@b.seeSunSet</td>
-                    <td>@b.seeSunRise</td>
-                </tr>
+            <tr>
+                <th scope="row">@b.label</th>
+                <td>@b.height</td>
+                <td>@b.width</td>
+                <td>@b.seeSunSet</td>
+                <td>@b.seeSunRise</td>
+                <td>@b.setLocation</td>
+                <td>@b.riseLocation</td>
+            </tr>
             }
         </tbody>
     </table>
@@ -60,7 +65,17 @@
     {
         List<IBuildingModel> send = new List<IBuildingModel>();
         List<IBuildingModel> rec = new List<IBuildingModel>();
-        buildings.Add(new DisplayBuildingModel{ height = building.height, label = building.label, width = building.width});
+        DisplayBuildingModel existingBuilding = buildings.Where(x => x.label == building.label).FirstOrDefault();
+        if (existingBuilding != null)
+        {
+            existingBuilding.height = building.height;
+            existingBuilding.width = building.width;
+        }
+        else
+        {
+            buildings.Add(new DisplayBuildingModel { height = building.height, label = building.label, width = building.width });
+        }
+
         foreach (var b in buildings)
         {
             send.Add(b);
@@ -69,7 +84,13 @@
         buildings.Clear();
         foreach (var r in rec)
         {
-            buildings.Add(new DisplayBuildingModel { height = r.height, label = r.label, width = r.width, seeSunRise = r.seeSunRise, seeSunSet = r.seeSunSet});
+            buildings.Add(new DisplayBuildingModel { height = r.height, label = r.label, width = r.width, seeSunRise = r.seeSunRise, seeSunSet = r.seeSunSet, riseLocation = r.riseLocation, setLocation = r.setLocation});
         }
+    }
+
+    private void ClearList()
+    {
+        buildings.Clear();
+        building = new DisplayBuildingModel();
     }
 }
