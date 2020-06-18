@@ -119,6 +119,28 @@ namespace SolarAnalysisBlazorUI.Pages
             var sunTime = await GeolocationInfo.GetDayLengthSeconds(address.lat, address.lon, address.date.ToShortDateString());
 
             address.timeSeconds = sunTime.day_length;
+
+            List<IBuildingModel> iBuildings = buildings.ToList<IBuildingModel>();
+
+
+            iBuildings = SolarTimeCalculator.CalculateSunTime(iBuildings, address.timeSeconds);
+            buildings.Clear();
+            foreach (var iBuild in iBuildings)
+            {
+                buildings.Add(new DisplayBuildingModel
+                {
+                    label = iBuild.label,
+                    height = iBuild.height,
+                    width = iBuild.width,
+                    riseLocation = iBuild.riseLocation,
+                    setLocation = iBuild.setLocation,
+                    seeSunRise = iBuild.seeSunRise, 
+                    seeSunSet = iBuild.seeSunSet,
+                    afternoonSunTime = iBuild.afternoonSunTime,
+                    morningSunTime = iBuild.morningSunTime
+                });
+            }
+
         }
     }
 }

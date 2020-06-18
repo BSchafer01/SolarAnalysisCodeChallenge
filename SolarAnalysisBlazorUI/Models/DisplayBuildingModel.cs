@@ -19,6 +19,7 @@ namespace SolarAnalysisBlazorUI.Models
         public int setLocation { get; set; }
         public bool seeSunSet { get; set; }
         public bool seeSunRise { get; set; }
-        public double sunTime { get; set; }
+        public double morningSunTime { get; set; }
+        public double afternoonSunTime { get; set; }
     }
 }

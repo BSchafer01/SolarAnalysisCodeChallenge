@@ -48,8 +48,8 @@
                 <th scope="col">Building Width</th>
                 <th scope="col">Sees Sunset</th>
                 <th scope="col">Sees Sunrise</th>
-                <th scope="col">Sunset Location</th>
-                <th scope="col">Sunrise Location</th>
+                <th scope="col">Morning Sun Time</th>
+                <th scope="col">Afternoon Sun Time</th>
 
             </tr>
         </thead>
@@ -62,8 +62,8 @@
                 <td>@b.width</td>
                 <td>@b.seeSunSet</td>
                 <td>@b.seeSunRise</td>
-                <td>@b.setLocation</td>
-                <td>@b.riseLocation</td>
+                <td>@b.morningSunTime</td>
+                <td>@b.afternoonSunTime</td>
             </tr>
             }
         </tbody>
@@ -72,7 +72,8 @@
 
 <SfChart Title="Sunset/Sunrise" @ref="chartObj">
     <ChartArea><ChartAreaBorder Width="0"></ChartAreaBorder></ChartArea>
-    <ChartPrimaryXAxis EdgeLabelPlacement="EdgeLabelPlacement.Shift">
+    <ChartPrimaryXAxis EdgeLabelPlacement="EdgeLabelPlacement.Shift" Interval="10" RangePadding="ChartRangePadding.Additional">
+
         <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
     </ChartPrimaryXAxis>
     <ChartPrimaryYAxis Title="Building Height (ft)" LabelFormat="{value}ft">
@@ -81,16 +82,16 @@
     </ChartPrimaryYAxis>
     <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
     <ChartSeriesCollection>
-        <ChartSeries DataSource="@ChartData" Name="Sunrise-Sunset" XName="xValue" Width="2"
+        <ChartSeries DataSource="@ChartData" Name="Sunrise-Sunset" Fill="yellow"XName="xValue" Width="2"
                      YName="sunriseSunset" Type="ChartSeriesType.StepArea">
         </ChartSeries>
-        <ChartSeries DataSource="@ChartData" Name="Sunset" XName="xValue" Width="2"
+        <ChartSeries DataSource="@ChartData" Name="Sunset" Fill="orange" XName="xValue" Width="2"
                      YName="sunset" Type="ChartSeriesType.StepArea">
         </ChartSeries>
-        <ChartSeries DataSource="@ChartData" Name="Sunrise" XName="xValue" Width="2"
+        <ChartSeries DataSource="@ChartData" Name="Sunrise" Fill="red" XName="xValue" Width="2"
                      YName="sunrise" Type="ChartSeriesType.StepArea">
         </ChartSeries>
-        <ChartSeries DataSource="@ChartData" Name="Shaded" XName="xValue" Width="2"
+        <ChartSeries DataSource="@ChartData" Name="Shaded" Fill="gray" XName="xValue" Width="2"
                      YName="noSun" Type="ChartSeriesType.StepArea">
         </ChartSeries>
     </ChartSeriesCollection>

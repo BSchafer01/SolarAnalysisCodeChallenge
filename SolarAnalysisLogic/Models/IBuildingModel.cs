@@ -9,6 +9,7 @@
         int width { get; set; }
         bool seeSunSet { get; set; }
         bool seeSunRise { get; set; }
-        double sunTime { get; set; }
+        double morningSunTime { get; set; }
+        double afternoonSunTime { get; set; }
     }
 }
