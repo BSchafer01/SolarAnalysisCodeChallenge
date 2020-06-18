@@ -1,4 +1,6 @@
 ﻿@page "/"
+@using Microsoft.Extensions.Configuration;
+
 
 <h1>Solar Analysis</h1>
 
@@ -24,6 +26,18 @@
 
 </EditForm>
 <br />
+<EditForm Model="@address" OnValidSubmit="HandleAddress">
+    <label>Address</label>
+    <InputText @bind-Value="@address.address" class="form-control"></InputText>
+
+    <label>Date</label>
+    <InputDate @bind-Value="@address.date" class="form-control"></InputDate>
+
+    <input type="submit" value="Get Daylight Hours" class="btn btn-primary"/>
+</EditForm>
+
+<h3>@address.lat : @address.lon</h3>
+<h3>@address.timeSeconds</h3>
 <br />
 <div class="table-responsive">
     <table class="table table-hover table-striped">
@@ -56,41 +70,32 @@
     </table>
 </div>
 
+<SfChart Title="Sunset/Sunrise" @ref="chartObj">
+    <ChartArea><ChartAreaBorder Width="0"></ChartAreaBorder></ChartArea>
+    <ChartPrimaryXAxis EdgeLabelPlacement="EdgeLabelPlacement.Shift">
+        <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
+    </ChartPrimaryXAxis>
+    <ChartPrimaryYAxis Title="Building Height (ft)" LabelFormat="{value}ft">
+        <ChartAxisLineStyle Width="0"></ChartAxisLineStyle>
+        <ChartAxisMajorTickLines Width="0"></ChartAxisMajorTickLines>
+    </ChartPrimaryYAxis>
+    <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+    <ChartSeriesCollection>
+        <ChartSeries DataSource="@ChartData" Name="Sunrise-Sunset" XName="xValue" Width="2"
+                     YName="sunriseSunset" Type="ChartSeriesType.StepArea">
+        </ChartSeries>
+        <ChartSeries DataSource="@ChartData" Name="Sunset" XName="xValue" Width="2"
+                     YName="sunset" Type="ChartSeriesType.StepArea">
+        </ChartSeries>
+        <ChartSeries DataSource="@ChartData" Name="Sunrise" XName="xValue" Width="2"
+                     YName="sunrise" Type="ChartSeriesType.StepArea">
+        </ChartSeries>
+        <ChartSeries DataSource="@ChartData" Name="Shaded" XName="xValue" Width="2"
+                     YName="noSun" Type="ChartSeriesType.StepArea">
+        </ChartSeries>
+    </ChartSeriesCollection>
+</SfChart>
+
 @code{
-    private DisplayBuildingModel building = new DisplayBuildingModel();
-    private List<DisplayBuildingModel> buildings = new List<DisplayBuildingModel>();
 
-
-    private void HandleValidSubmit()
-    {
-        List<IBuildingModel> send = new List<IBuildingModel>();
-        List<IBuildingModel> rec = new List<IBuildingModel>();
-        DisplayBuildingModel existingBuilding = buildings.Where(x => x.label == building.label).FirstOrDefault();
-        if (existingBuilding != null)
-        {
-            existingBuilding.height = building.height;
-            existingBuilding.width = building.width;
-        }
-        else
-        {
-            buildings.Add(new DisplayBuildingModel { height = building.height, label = building.label, width = building.width });
-        }
-
-        foreach (var b in buildings)
-        {
-            send.Add(b);
-        }
-        rec = SunsetSunriseIdentifier.SunsetCheck(send);
-        buildings.Clear();
-        foreach (var r in rec)
-        {
-            buildings.Add(new DisplayBuildingModel { height = r.height, label = r.label, width = r.width, seeSunRise = r.seeSunRise, seeSunSet = r.seeSunSet, riseLocation = r.riseLocation, setLocation = r.setLocation});
-        }
-    }
-
-    private void ClearList()
-    {
-        buildings.Clear();
-        building = new DisplayBuildingModel();
-    }
 }

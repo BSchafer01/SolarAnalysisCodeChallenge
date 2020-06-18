@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SolarAnalysisBlazorUI.Data;
+using Syncfusion.Blazor;
 
 namespace SolarAnalysisBlazorUI
 {
@@ -29,11 +30,14 @@ namespace SolarAnalysisBlazorUI
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
+            services.AddSyncfusionBlazor();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(Configuration.GetValue<string>("Licensing:Syncfusion"));
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
