@@ -11,9 +11,9 @@ This project was developed as an entry for the CoderFoundry Sunset Hills coding 
 
 ### Features
 * Accepts an unlimited number of buildings with: 
-** Unique labels
-** Building Heights
-** Building Widths
+    + Unique labels
+    + Building Heights
+    + Building Widths
 * Determines which buildings will see the sunset, sunrise, both, or neither
 * Plots the results in a stepped filled area chart
 * Displays the building data in an easy to read table
