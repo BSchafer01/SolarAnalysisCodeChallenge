@@ -1,4 +1,4 @@
-# SolarAnalysisCodeChallenge
+# Solar Analysis (Sunset Hills) Code Challenge
 
 [![Current Version](https://img.shields.io/badge/version-1.0.0-green.svg)](https://github.com/BSchafer01/SolarAnalysisCodeChallenge) [![Live Demo](https://img.shields.io/badge/demo-online-green.svg)](https://cfsolaranalysis.azurewebsites.net/)
 
