@@ -42,6 +42,16 @@ namespace SolarAnalysisLogic
                                 morningAngle.Add(AngleNotCovered(building, building.riseLocation, b.x, b.x.riseLocation));
                             }
                         }
+                        else
+                        {
+                            morningAngle.Add(maxMorning);
+                            afternoonAngle.Add(maxAfternoon);
+                        }
+                    }
+                    else
+                    {
+                        morningAngle.Add(maxMorning);
+                        afternoonAngle.Add(maxAfternoon);
                     }
                     
                 }

@@ -3,6 +3,7 @@ using SolarAnalysisBlazorUI.Models;
 using SolarAnalysisLogic;
 using SolarAnalysisLogic.Models;
 using Syncfusion.Blazor.Charts;
+using Syncfusion.Blazor.DropDowns;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,12 +16,15 @@ namespace SolarAnalysisBlazorUI.Pages
         private DisplayBuildingModel building = new DisplayBuildingModel();
         private List<DisplayBuildingModel> buildings = new List<DisplayBuildingModel>();
         private List<ChartDataModel> ChartData = new List<ChartDataModel>();
+        private List<BarChartModel> barData = new List<BarChartModel>();
         private SfChart chartObj;
+        private SfChart barObj;
 
-        private AddressDaylightModel address = new AddressDaylightModel();
+
+        private AddressDaylightModel address = new AddressDaylightModel() { date = DateTime.Today};
 
 
-        private void HandleValidSubmit()
+        private async Task HandleValidSubmit()
         {
             List<IBuildingModel> send = new List<IBuildingModel>();
             List<IBuildingModel> rec = new List<IBuildingModel>();
@@ -100,20 +104,27 @@ namespace SolarAnalysisBlazorUI.Pages
                 });
 
             }
-            chartObj.RefreshLiveData();
+            if (address.timeSeconds > 0)
+            {
+                await HandleAddress();
+            }
+
+            await chartObj.RefreshLiveData();
         }
 
         private void ClearList()
         {
             buildings.Clear();
             building = new DisplayBuildingModel();
+            barData.Clear();
             ChartData.Clear();
+            barObj.RefreshLiveData();
             chartObj.RefreshLiveData();
         }
 
         private async Task HandleAddress()
         {
-            var latlon = GeolocationInfo.GetLatLong(address.address, "AIzaSyCTNhOzSCncbXoOLfcBwl0aOtXpAAI");
+            var latlon = GeolocationInfo.GetLatLong(address.address, "REDACTED");
             address.lat = latlon.lat;
             address.lon = latlon.lon;
             var sunTime = await GeolocationInfo.GetDayLengthSeconds(address.lat, address.lon, address.date.ToShortDateString());
@@ -125,6 +136,7 @@ namespace SolarAnalysisBlazorUI.Pages
 
             iBuildings = SolarTimeCalculator.CalculateSunTime(iBuildings, address.timeSeconds);
             buildings.Clear();
+            barData.Clear();
             foreach (var iBuild in iBuildings)
             {
                 buildings.Add(new DisplayBuildingModel
@@ -139,8 +151,12 @@ namespace SolarAnalysisBlazorUI.Pages
                     afternoonSunTime = iBuild.afternoonSunTime,
                     morningSunTime = iBuild.morningSunTime
                 });
+                barData.Add(new BarChartModel { label = iBuild.label, morningSun = iBuild.morningSunTime, afternoonSun = iBuild.afternoonSunTime });
             }
 
+            await barObj.RefreshLiveData();
+
         }
+
     }
 }

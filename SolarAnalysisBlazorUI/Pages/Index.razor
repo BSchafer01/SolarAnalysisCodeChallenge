@@ -1,101 +1,149 @@
 ﻿@page "/"
-@using Microsoft.Extensions.Configuration;
 
+<p>Welcome to the one stop solar analysis shop for a single line of buildings: <ul><li>To determine which sun a building is likely to see fill out the Building Data form below</li><li>Be sure to enter the buildings from west to east</li><li>For building solar exposure enter an address or postal code and select a date of interest</li><li>The accompanying charts ang graphs will help break down the findings</li></ul> </p>
 
-<h1>Solar Analysis</h1>
+<div class="main-grid">
+    <EditForm Model="@building" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary Model="@building" />
+        <div class="building-container">
+            <h3 id="buildingFormTitle" data-toggle="tooltip" data-placement="bottom" title="Enter the building's name, height, and width starting with the west-most building and click Add Building when done. To update an existing building make the label equal the building to update and make the modifications needed to the height and/or width. To remove all buildings and start over click Clear Buildings.">Building Data Entry <i class="fas fa-question-circle" /></h3>
+            <label id="buildingLabel" for="buildingText">Building Label</label>
+            <InputText @bind-Value="building.label" class="form-control" id="buildingText"></InputText>
+            <ValidationMessage id="buildingMessage" For="@(() => building.label)" class="text-danger" />
 
-<p>Enter the building data in order of building location from left to right.</p>
+            <label id="buildingHeightLabel" for="buildingHeight">Building Height (ft)</label>
+            <InputNumber @bind-Value="@building.height" class="form-control" id="buildingHeight"></InputNumber>
+            <ValidationMessage id="buildingHeightMessage" For="@(() => building.height)" class="text-danger" />
 
+            <label id="buildingWidthLabel" for="buildingWidth">Building Width (ft)</label>
+            <InputNumber @bind-Value="@building.width" class="form-control" id="buildingWidth"></InputNumber>
+            <ValidationMessage id="buildingWidthMessage" For="@(() => building.width)" class="text-danger" />
 
-<EditForm Model="@building" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary Model="@building" />
-    <div class="container">
-        <label id="buildingLabel" for="buildingText" >Building Label</label>
-        <InputText @bind-Value="building.label" class="form-control" id="buildingText"></InputText>
+            <input type="submit" id="formSubmit" value="Add Building" class="btn btn-primary" />
+            <input type="button" id="clearList" value="Clear Buildings" class="btn btn-danger" @onclick="@(() => ClearList())" />
+        </div>
 
-        <label id="buildingHeightLabel" for="buildingHeight">Building Height (ft)</label>
-        <InputNumber @bind-Value="@building.height" class="form-control" id="buildingHeight"></InputNumber>
+    </EditForm>
+    <EditForm Model="@address" OnValidSubmit="HandleAddress">
+        <DataAnnotationsValidator />
+        <ValidationSummary Model="@address" />
+        <div class="geo-container">
+            <h3 id="geoContainerTitle" data-toggle="tooltip" data-placement="bottom" title="Enter an address or postal code and select a date you wish to run the daylight analysis on.">Daylight Data Entry <i class="fas fa-question-circle" /></h3>
+            <label id="addressLabel">Address</label>
+            <InputText @bind-Value="@address.address" class="form-control" id="addressInput"></InputText>
+            <ValidationMessage id="addressMessage" For="@(() => address.address)" class="text-danger" />
 
-        <label id="buildingWidthLabel" for="buildingWidth">Building Width (ft)</label>
-        <InputNumber @bind-Value="@building.width" class="form-control" id="buildingWidth"></InputNumber>
+            <label id="addressDateLabel">Date</label>
+            <InputDate @bind-Value="address.date" class="form-control" id="addressDateInput" />
+            <ValidationMessage id="addressDateMessage" For="@(() => address.date)" class="text-danger" />
 
-        <input type="submit" id="formSubmit" value="Add Building" class="btn btn-primary"/>
-        <input type="button" id="clearList" value="Clear Buildings" class="btn btn-danger" @onclick="@(() => ClearList())"/>
+            <h6 id="daylightLabel">Daylight: @address.timeSeconds sec</h6>
+            <input type="submit" value="Run Solar Analysis" class="btn btn-primary" />
+        </div>
+
+    </EditForm>
+
+    <div class="table-responsive table-container">
+        <table class="table table-hover table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Building Label</th>
+                    <th scope="col">Building Height</th>
+                    <th scope="col">Building Width</th>
+                    <th scope="col">Sees Sunset</th>
+                    <th scope="col">Sees Sunrise</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var b in buildings)
+                {
+                    <tr>
+                        <th scope="row">@b.label</th>
+                        <td>@b.height</td>
+                        <td>@b.width</td>
+                        <td>
+                            @if (b.seeSunSet)
+                            {<i class="fas fa-check" style="color: green" /> }
+                            else
+                            {<i class="fas fa-ban" style="color: red" />}
+                        </td>
+                        <td>
+                            @if (b.seeSunRise)
+                            {<i class="fas fa-check" style="color: green" /> }
+                            else
+                            {<i class="fas fa-ban" style="color: red" />}
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 
-</EditForm>
-<br />
-<EditForm Model="@address" OnValidSubmit="HandleAddress">
-    <label>Address</label>
-    <InputText @bind-Value="@address.address" class="form-control"></InputText>
+    <div class="chart-container">
+        <SfChart Title="Sunset/Sunrise" @ref="chartObj">
+            <ChartArea><ChartAreaBorder Width="0"></ChartAreaBorder></ChartArea>
+            <ChartPrimaryXAxis EdgeLabelPlacement="EdgeLabelPlacement.Shift" Interval="10" RangePadding="ChartRangePadding.Additional">
 
-    <label>Date</label>
-    <InputDate @bind-Value="@address.date" class="form-control"></InputDate>
+                <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
+            </ChartPrimaryXAxis>
+            <ChartPrimaryYAxis Title="Building Height (ft)" LabelFormat="{value}ft">
+                <ChartAxisLineStyle Width="0"></ChartAxisLineStyle>
+                <ChartAxisMajorTickLines Width="0"></ChartAxisMajorTickLines>
+            </ChartPrimaryYAxis>
+            <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+            <ChartSeriesCollection>
+                <ChartSeries DataSource="@ChartData" Name="Sunrise-Sunset" Fill="yellow" XName="xValue" Width="2"
+                             YName="sunriseSunset" Type="ChartSeriesType.StepArea">
+                </ChartSeries>
+                <ChartSeries DataSource="@ChartData" Name="Sunset" Fill="orange" XName="xValue" Width="2"
+                             YName="sunset" Type="ChartSeriesType.StepArea">
+                </ChartSeries>
+                <ChartSeries DataSource="@ChartData" Name="Sunrise" Fill="red" XName="xValue" Width="2"
+                             YName="sunrise" Type="ChartSeriesType.StepArea">
+                </ChartSeries>
+                <ChartSeries DataSource="@ChartData" Name="Shaded" Fill="gray" XName="xValue" Width="2"
+                             YName="noSun" Type="ChartSeriesType.StepArea">
+                </ChartSeries>
+            </ChartSeriesCollection>
+        </SfChart>
+    </div>
+    <div class="gauge-container">
 
-    <input type="submit" value="Get Daylight Hours" class="btn btn-primary"/>
-</EditForm>
+        <SfChart Title="Solar Exposure of Each Building" @ref="barObj">
+            <ChartArea><ChartAreaBorder Width="0"></ChartAreaBorder></ChartArea>
+            <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" Title="Buildings">
+                <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
+            </ChartPrimaryXAxis>
+            <ChartPrimaryYAxis LabelFormat="{value} sec" EdgeLabelPlacement="EdgeLabelPlacement.Shift">
+                <ChartAxisLineStyle Width="0"></ChartAxisLineStyle>
+                <ChartAxisLabelStyle Color="transparent"></ChartAxisLabelStyle>
+                <ChartAxisMajorTickLines Width="0"></ChartAxisMajorTickLines>
+                <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
+            </ChartPrimaryYAxis>
+            <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+            <ChartSeriesCollection>
+                <ChartSeries DataSource="@barData" XName="label" YName="morningSun" Name="Morning Sun" Width="2" Type="ChartSeriesType.Bar">
+                    <ChartMarker>
+                        <ChartDataLabel Visible="true" Position="LabelPosition.Top"></ChartDataLabel>
+                    </ChartMarker>
+                </ChartSeries>
+                <ChartSeries DataSource="@barData" XName="label" YName="afternoonSun" Name="Afternoon Sun" Width="2" Type="ChartSeriesType.Bar">
+                    <ChartMarker>
+                        <ChartDataLabel Visible="true" Position="LabelPosition.Top"></ChartDataLabel>
+                    </ChartMarker>
+                </ChartSeries>
+            </ChartSeriesCollection>
+        </SfChart>
 
-<h3>@address.lat : @address.lon</h3>
-<h3>@address.timeSeconds</h3>
-<br />
-<div class="table-responsive">
-    <table class="table table-hover table-striped">
-        <thead>
-            <tr>
-                <th scope="col">Building Label</th>
-                <th scope="col">Building Height</th>
-                <th scope="col">Building Width</th>
-                <th scope="col">Sees Sunset</th>
-                <th scope="col">Sees Sunrise</th>
-                <th scope="col">Morning Sun Time</th>
-                <th scope="col">Afternoon Sun Time</th>
+    </div>
+    
 
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var b in buildings)
-            {
-            <tr>
-                <th scope="row">@b.label</th>
-                <td>@b.height</td>
-                <td>@b.width</td>
-                <td>@b.seeSunSet</td>
-                <td>@b.seeSunRise</td>
-                <td>@b.morningSunTime</td>
-                <td>@b.afternoonSunTime</td>
-            </tr>
-            }
-        </tbody>
-    </table>
+    
 </div>
 
-<SfChart Title="Sunset/Sunrise" @ref="chartObj">
-    <ChartArea><ChartAreaBorder Width="0"></ChartAreaBorder></ChartArea>
-    <ChartPrimaryXAxis EdgeLabelPlacement="EdgeLabelPlacement.Shift" Interval="10" RangePadding="ChartRangePadding.Additional">
 
-        <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
-    </ChartPrimaryXAxis>
-    <ChartPrimaryYAxis Title="Building Height (ft)" LabelFormat="{value}ft">
-        <ChartAxisLineStyle Width="0"></ChartAxisLineStyle>
-        <ChartAxisMajorTickLines Width="0"></ChartAxisMajorTickLines>
-    </ChartPrimaryYAxis>
-    <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
-    <ChartSeriesCollection>
-        <ChartSeries DataSource="@ChartData" Name="Sunrise-Sunset" Fill="yellow"XName="xValue" Width="2"
-                     YName="sunriseSunset" Type="ChartSeriesType.StepArea">
-        </ChartSeries>
-        <ChartSeries DataSource="@ChartData" Name="Sunset" Fill="orange" XName="xValue" Width="2"
-                     YName="sunset" Type="ChartSeriesType.StepArea">
-        </ChartSeries>
-        <ChartSeries DataSource="@ChartData" Name="Sunrise" Fill="red" XName="xValue" Width="2"
-                     YName="sunrise" Type="ChartSeriesType.StepArea">
-        </ChartSeries>
-        <ChartSeries DataSource="@ChartData" Name="Shaded" Fill="gray" XName="xValue" Width="2"
-                     YName="noSun" Type="ChartSeriesType.StepArea">
-        </ChartSeries>
-    </ChartSeriesCollection>
-</SfChart>
 
 @code{
 
