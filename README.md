@@ -1,5 +1,7 @@
 # SolarAnalysisCodeChallenge
 
+[![Current Version](https://img.shields.io/badge/version-1.0.0-green.svg)](https://github.com/BSchafer01/SolarAnalysisCodeChallenge) [![Live Demo](https://img.shields.io/badge/demo-online-green.svg)](https://cfsolaranalysis.azurewebsites.net/)
+
 ## Table of Contents
 * [General info](#general-info)
 * [Technologies](#technologies)
