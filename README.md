@@ -22,7 +22,8 @@ This project was developed as an entry for the CoderFoundry Sunset Hills coding 
 
 * Accepts an address/postal code and date
 * Pulls the total daylight time from sunrise-sunset.org's API
-* Calculates the total sun exposure based off shadows of other buildings in the line `shadow at roof level = (TallBuildingHeight - ShortBuildingHeight)/tan(SunAngle)`
+* Calculates the total sun exposure based off shadows of other buildings in the line 
+    + `shadow at roof level = (TallBuildingHeight - ShortBuildingHeight)/tan(SunAngle)`
 * Plots the total morning sun time and the total afternoon sun time for each building on a bar chart
  
  
